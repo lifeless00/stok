@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Firmalar{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Firmalar</h5>
+        {% if user.is_superuser %}
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFirmModal">
+            <i class="bi bi-plus"></i> Yeni Firma
+        </button>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Firma Adı</th>
+                    <th>Telefon</th>
+                    <th>Adres</th>
+                    <th>Kayıt Tarihi</th>
+                    {% if user.is_superuser %}
+                    <th>İşlemler</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for firm in firms %}
+                <tr>
+                    <td>{{ firm.name }}</td>
+                    <td>{{ firm.phone }}</td>
+                    <td>{{ firm.address }}</td>
+                    <td>{{ firm.created|date:"d.m.Y" }}</td>
+                    {% if user.is_superuser %}
+                    <td>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editFirmModal{{ firm.id }}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                    {% endif %}
+                </tr>
+
+                {% if user.is_superuser %}
+                <!-- Edit Firm Modal -->
+                <div class="modal fade" id="editFirmModal{{ firm.id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Firma Düzenle</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form method="post" action="{% url 'edit_firm' firm.id %}">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Firma Adı</label>
+                                        <input type="text" name="name" class="form-control" value="{{ firm.name }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Telefon</label>
+                                        <input type="tel" name="phone" class="form-control" value="{{ firm.phone }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Adres</label>
+                                        <textarea name="address" class="form-control" rows="3" required>{{ firm.address }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                    <button type="submit" class="btn btn-primary">Güncelle</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if user.is_superuser %}
+<!-- Add Firm Modal -->
+<div class="modal fade" id="addFirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Yeni Firma Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Firma Adı</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Telefon</label>
+                        <input type="tel" name="phone" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Adres</label>
+                        <textarea name="address" class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %} 

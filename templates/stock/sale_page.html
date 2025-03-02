@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}Satış Sayfası{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Satış Sayfası</h2>
+    
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100">
+                <div class="d-flex align-items-center justify-content-center" style="height: 100px; padding: 10px;">
+                    {% if product.brand.image %}
+                    <img src="{{ product.brand.image.url }}" class="img-fluid" alt="{{ product.brand.name }}" 
+                        style="max-height: 80px; max-width: 100%; object-fit: contain;">
+                    {% else %}
+                    <i class="bi bi-building" style="font-size: 2rem;"></i>
+                    {% endif %}
+                </div>
+                
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">
+                        <small class="text-muted">Marka: {{ product.brand.name }}</small><br>
+                        <small class="text-muted">Kategori: {{ product.category.name }}</small><br>
+                        <small class="text-muted">Stok: {{ product.stock }}</small>
+                    </p>
+                </div>
+                
+                <div style="height: 200px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" 
+                        style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                    {% else %}
+                    <i class="bi bi-box" style="font-size: 3rem;"></i>
+                    {% endif %}
+                </div>
+                
+                <div class="card-footer">
+                    {% if product.stock > 0 %}
+                    <button type="button" class="btn btn-primary w-100" 
+                            onclick="openSaleModal('{{ product.id }}', '{{ product.name }}', {{ product.stock }}, '{{ product.purchase_price|stringformat:'f' }}')">
+                        <i class="bi bi-cart-check"></i> Satış Yap
+                    </button>
+                    {% else %}
+                    <button type="button" class="btn btn-secondary w-100" disabled>
+                        <i class="bi bi-exclamation-triangle"></i> Stok Yok
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="saleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Satış</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="saleForm" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" id="product_id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Miktar</label>
+                        <input type="number" name="quantity" id="quantity" class="form-control" required min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Birim Fiyat (₺)</label>
+                        <input type="number" name="price" id="price" class="form-control" required step="0.01">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" id="makeSaleButton" class="btn btn-primary">Satış Yap</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+let saleModal;
+let currentForm;
+
+document.addEventListener('DOMContentLoaded', function() {
+    saleModal = new bootstrap.Modal(document.getElementById('saleModal'));
+    currentForm = document.getElementById('saleForm');
+    
+    currentForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+    });
+    
+    document.getElementById('makeSaleButton').addEventListener('click', function(e) {
+        if (!this.disabled) {
+            this.disabled = true;
+            currentForm.submit();
+            saleModal.hide();
+        }
+    });
+});
+
+function openSaleModal(productId, productName, maxStock, purchasePrice) {
+    try {
+        currentForm.reset();
+        document.getElementById('makeSaleButton').disabled = false;
+        
+        document.getElementById('modalTitle').textContent = productName + ' - Satış';
+        
+        document.getElementById('product_id').value = productId;
+        document.getElementById('quantity').max = maxStock;
+        document.getElementById('quantity').value = '1';
+        
+        const basePrice = parseFloat(purchasePrice);
+        if (!isNaN(basePrice)) {
+            const suggestedPrice = basePrice + 500000;
+            document.getElementById('price').value = suggestedPrice.toFixed(2);
+            document.getElementById('price').min = suggestedPrice;
+        } else {
+            console.error('Geçersiz alış fiyatı:', purchasePrice);
+            document.getElementById('price').value = '0.00';
+        }
+        
+        saleModal.show();
+    } catch (error) {
+        console.error('Modal açılırken hata:', error);
+    }
+}
+</script>
+{% endblock %} 

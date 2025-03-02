@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Satışlar{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h2 class="mb-4">Satışlar</h2>
+            
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Ürün</th>
+                            <th>Marka</th>
+                            <th>Miktar</th>
+                            <th>Birim Fiyat</th>
+                            <th>Toplam Fiyat</th>
+                            <th>Tarih</th>
+                            <th>Satışı Yapan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in sales %}
+                        <tr>
+                            <td>{{ sale.product.name }}</td>
+                            <td>{{ sale.brand.name }}</td>
+                            <td>{{ sale.quantity }}</td>
+                            <td>{{ sale.price }} ₺</td>
+                            <td>{{ sale.price_total }} ₺</td>
+                            <td>{{ sale.created|date:"d.m.Y H:i" }}</td>
+                            <td>{{ sale.user.username }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

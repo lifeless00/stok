@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Ana Sayfa{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Toplam Ürün</h5>
+                <h2 class="display-4">{{ total_products }}</h2>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{% url 'product_list' %}">Detayları Görüntüle</a>
+                <div class="small text-white"><i class="bi bi-chevron-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Toplam Kategori</h5>
+                <h2 class="display-4">{{ total_categories }}</h2>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{% url 'category_list' %}">Detayları Görüntüle</a>
+                <div class="small text-white"><i class="bi bi-chevron-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Toplam Alım</h5>
+                <h2 class="display-4">{{ total_purchases }}</h2>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{% url 'purchase_list' %}">Detayları Görüntüle</a>
+                <div class="small text-white"><i class="bi bi-chevron-right"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Toplam Satış</h5>
+                <h2 class="display-4">{{ total_sales }}</h2>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <a class="small text-white stretched-link" href="{% url 'sale_list' %}">Detayları Görüntüle</a>
+                <div class="small text-white"><i class="bi bi-chevron-right"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Son Alımlar</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Ürün</th>
+                            <th>Miktar</th>
+                            <th>Toplam</th>
+                            <th>Tarih</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for purchase in recent_purchases %}
+                        <tr>
+                            <td>{{ purchase.product.name }}</td>
+                            <td>{{ purchase.quantity }}</td>
+                            <td>{{ purchase.price_total }} ₺</td>
+                            <td>{{ purchase.created|date:"d.m.Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Son Satışlar</h5>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Ürün</th>
+                            <th>Miktar</th>
+                            <th>Toplam</th>
+                            <th>Tarih</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in recent_sales %}
+                        <tr>
+                            <td>{{ sale.product.name }}</td>
+                            <td>{{ sale.quantity }}</td>
+                            <td>{{ sale.price_total }} ₺</td>
+                            <td>{{ sale.created|date:"d.m.Y" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

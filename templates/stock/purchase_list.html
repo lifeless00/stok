@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Alımlar{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Alımlar</h5>
+        {% if user.is_superuser %}
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPurchaseModal">
+            <i class="bi bi-plus"></i> Yeni Alım
+        </button>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <select class="form-select" id="productFilter">
+                    <option value="">Tüm Ürünler</option>
+                    {% for product in products %}
+                    <option value="{{ product.id }}">{{ product.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="firmFilter">
+                    <option value="">Tüm Firmalar</option>
+                    {% for firm in firms %}
+                    <option value="{{ firm.id }}">{{ firm.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Ürün</th>
+                    <th>Firma</th>
+                    <th>Miktar</th>
+                    <th>Birim Fiyat</th>
+                    <th>Toplam Fiyat</th>
+                    <th>Tarih</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for purchase in purchases %}
+                <tr>
+                    <td>{{ purchase.product.name }}</td>
+                    <td>{{ purchase.firm.name }}</td>
+                    <td>{{ purchase.quantity }}</td>
+                    <td>{{ purchase.price }} ₺</td>
+                    <td>{{ purchase.price_total }} ₺</td>
+                    <td>{{ purchase.created|date:"d.m.Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if user.is_superuser %}
+<div class="modal fade" id="addPurchaseModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Yeni Alım Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Ürün</label>
+                        <select name="product" class="form-select" required>
+                            {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Firma</label>
+                        <select name="firm" class="form-select" required>
+                            {% for firm in firms %}
+                            <option value="{{ firm.id }}">{{ firm.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Miktar</label>
+                        <input type="number" name="quantity" class="form-control" required min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Birim Fiyat (₺)</label>
+                        <input type="number" name="price" class="form-control" required min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %} 
